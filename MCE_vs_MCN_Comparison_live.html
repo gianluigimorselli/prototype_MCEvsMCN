@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCE vs MCN + Data 360 — Capability Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --hilti-red:#CC2229;
+    --hilti-red-dark:#A70009;
+    --ink:#161615;
+    --ink-soft:#4A4A48;
+    --line:#DEDCD5;
+    --paper:#FFFFFF;
+    --paper-soft:#F5F4F0;
+    --gold:#B08D2E;
+    --blueprint:#2E5B8A;
+    --blueprint-soft:#E8EEF4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',Arial,sans-serif;
+    color:var(--ink);
+    background:var(--paper-soft);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Barlow Condensed',Arial,sans-serif;
+    font-weight:700;
+    margin:0;
+    letter-spacing:0.2px;
+  }
+  header.topbar{
+    background:var(--hilti-red);
+    color:#fff;
+    padding:18px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .brand{ display:flex; align-items:center; gap:14px; }
+  .brand .logo{ height:34px; width:auto; display:block; }
+  .brand .divider{ width:1px; height:22px; background:rgba(255,255,255,0.5); }
+  .brand .subtitle{ font-size:14px; color:rgba(255,255,255,0.92); font-weight:500; }
+  #exportBtn{
+    background:#fff;
+    color:var(--hilti-red);
+    border:none;
+    border-radius:2px;
+    padding:10px 20px;
+    font-family:'Inter',Arial,sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:background 0.15s ease;
+  }
+  #exportBtn:hover{ background:#f0f0f0; }
+  .hero{ padding:40px 32px 24px; max-width:1180px; margin:0 auto; }
+  .hero h1{ font-size:38px; line-height:1.05; color:var(--ink); }
+  .hero p{ max-width:680px; font-size:15px; color:var(--ink-soft); line-height:1.6; margin-top:12px; }
+  nav.layer-menu{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    padding:0 32px;
+  }
+  .menu-inner{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:10px 0;
+  }
+  .menu-btn{
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:8px 14px;
+    font-family:'Inter',Arial,sans-serif;
+    font-size:13px;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all 0.15s ease;
+  }
+  .menu-btn:hover{ border-color:var(--hilti-red); color:var(--hilti-red); }
+  .menu-btn.active{ background:var(--hilti-red); border-color:var(--hilti-red); color:#fff; }
+  main{ max-width:1180px; margin:0 auto; padding:24px 32px 60px; }
+  section.layer-block{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:2px;
+    margin-bottom:24px;
+    overflow:hidden;
+  }
+  .layer-head{
+    padding:16px 24px;
+    border-left:5px solid var(--hilti-red);
+    background:var(--paper-soft);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .layer-head h2{ font-size:22px; }
+  table.compare{ width:100%; border-collapse:collapse; font-size:14px; }
+  table.compare thead th{
+    background:var(--ink);
+    color:#fff;
+    text-align:left;
+    padding:12px 20px;
+    font-weight:600;
+    font-size:13px;
+  }
+  table.compare th:first-child, table.compare td:first-child{ width:24%; }
+  table.compare th:nth-child(2), table.compare td:nth-child(2),
+  table.compare th:nth-child(3), table.compare td:nth-child(3){ width:38%; }
+  table.compare td{
+    padding:14px 20px;
+    border-top:1px solid var(--line);
+    vertical-align:top;
+    line-height:1.5;
+    color:var(--ink);
+  }
+  table.compare td.cap{ font-weight:600; background:var(--paper-soft); }
+  tr.score-row.maturity td{ background:#FCEEE0; font-style:italic; color:#5a4321; font-size:13.5px; }
+  tr.score-row.maturity td.cap{ background:var(--gold); color:#fff; font-style:normal; font-weight:600; }
+  tr.score-row.potential td{ background:var(--blueprint-soft); font-style:italic; color:#1c3a55; font-size:13.5px; }
+  tr.score-row.potential td.cap{ background:var(--blueprint); color:#fff; font-style:normal; font-weight:600; }
+  .score-badge{
+    display:inline-block;
+    font-style:normal;
+    font-weight:700;
+    background:#fff;
+    border-radius:2px;
+    padding:1px 8px;
+    margin-right:8px;
+    font-size:13px;
+  }
+  tr.score-row.maturity .score-badge{ color:var(--gold); }
+  tr.score-row.potential .score-badge{ color:var(--blueprint); }
+  section.summary{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:28px 24px;
+    margin-top:8px;
+  }
+  section.summary h2{ font-size:24px; margin-bottom:4px; border-left:5px solid var(--hilti-red); padding-left:15px; }
+  .summary-sub{ font-size:13px; color:var(--ink-soft); margin:6px 0 24px 20px; }
+  .chart-filter{ margin:4px 0 20px; }
+  .chart-filter .filter-label{
+    font-size:13px;
+    color:var(--ink-soft);
+    font-weight:500;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .chart-filter .filter-actions button{
+    background:none;
+    border:none;
+    color:var(--hilti-red);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    padding:0;
+    margin-left:12px;
+  }
+  .filter-pills{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:7px 12px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    background:#fff;
+    color:var(--ink-soft);
+    transition:all 0.15s ease;
+    user-select:none;
+  }
+  .pill .dot{ width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+  .pill.off{ color:#B7B5AC; background:var(--paper-soft); }
+  .pill.off .dot{ opacity:0.3; }
+  .pill:hover{ border-color:var(--hilti-red); }
+  .view-switch{
+    display:inline-flex;
+    border:1px solid var(--line);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+  .view-switch button{
+    background:#fff;
+    border:none;
+    padding:9px 18px;
+    font-family:'Inter',Arial,sans-serif;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border-right:1px solid var(--line);
+  }
+  .view-switch button:last-child{ border-right:none; }
+  .view-switch button.active{ background:var(--ink); color:#fff; }
+  .avg-cards{ display:flex; gap:16px; margin:0 0 24px; flex-wrap:wrap; }
+  .avg-card{
+    flex:1;
+    min-width:250px;
+    background:var(--paper-soft);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:16px 20px;
+  }
+  .avg-card .label{ font-size:13px; color:var(--ink-soft); font-weight:500; margin-bottom:10px; }
+  .avg-card .rows{ display:flex; align-items:baseline; gap:20px; flex-wrap:wrap; }
+  .avg-card .metric-label{ font-size:11px; text-transform:none; color:var(--ink-soft); display:block; margin-bottom:2px; }
+  .avg-card .value{ font-family:'Barlow Condensed',Arial,sans-serif; font-size:32px; font-weight:700; line-height:1; }
+  .avg-card.mce .value.maturity{ color:var(--hilti-red); }
+  .avg-card.mcn .value.maturity{ color:var(--ink); }
+  .avg-card .value.potential{ color:var(--blueprint); }
+  .avg-card .value span{ font-size:16px; color:var(--ink-soft); font-family:'Inter',Arial,sans-serif; font-weight:500; }
+  .chart-wrap{ position:relative; height:320px; margin-top:8px; }
+  .chart-note{ font-size:12px; color:var(--ink-soft); margin-top:8px; font-style:italic; }
+  footer{ text-align:center; padding:24px; font-size:12px; color:var(--ink-soft); }
+  @media (max-width:720px){
+    table.compare, table.compare thead, table.compare tbody, table.compare th, table.compare td, table.compare tr{ display:block; }
+    table.compare thead{ display:none; }
+    table.compare td{ border-top:none; border-bottom:1px solid var(--line); }
+    table.compare td.cap{ border-bottom:none; padding-bottom:4px; }
+    table.compare th:first-child, table.compare td:first-child,
+    table.compare th:nth-child(2), table.compare td:nth-child(2),
+    table.compare th:nth-child(3), table.compare td:nth-child(3){ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img class="logo" alt="Hilti" src="data:image/png;base64,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">
+    <span class="divider"></span>
+    <span class="subtitle">Martech platform review</span>
+  </div>
+  <button id="exportBtn">Export to Excel</button>
+</header>
+
+<div class="hero">
+  <h1>Marketing Cloud Engagement vs. Marketing Cloud Next</h1>
+  <p>Both platforms paired with Data 360. Compare capabilities layer by layer, review maturity score vs. potential score, and export the full table for offline use.</p>
+</div>
+
+<nav class="layer-menu">
+  <div class="menu-inner" id="menuInner"></div>
+</nav>
+
+<main id="mainContent"></main>
+
+<footer>Prepared for internal review · Scores are directional, based on current and reasonably projected platform capabilities <span id="syncStatus" style="opacity:0.6;"></span></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+
+const DATA = {
+  layers: [
+    {
+      id: "integration",
+      title: "1. Integration layer",
+      rows: [
+        ["CRM / core platform connectivity",
+          "Connects to Salesforce CRM data through separate integration tools and connectors, since MCE was built as a standalone platform.",
+          "Runs directly on the Salesforce Core platform, so it reads and writes CRM data without extra integration work."],
+        ["Data sync model",
+          "Uses scheduled batch syncs to move data between MCE and Data 360, so updates are not always instant.",
+          "Uses real time, zero copy access to Data 360, so there is no waiting for data to sync."],
+        ["Third party system integration",
+          "Integrates with outside systems mainly through APIs and connectors built specifically for MCE.",
+          "Integrates through the wider Salesforce platform, including MuleSoft and Data 360 connectors, so outside data plugs into the same foundation used by sales and service."],
+        ["Identity resolution touchpoints across channels",
+          "Identity resolution happens in Data 360, then results are synced back into MCE before they can be used in campaigns.",
+          "Identity resolution happens natively in Data 360 and is available immediately across marketing, sales, and service, with no separate sync step."]
+      ],
+      mce: {
+        current: { score: 4, note: "Integration is well established and reliable, but it relies on connectors and scheduled syncs, which adds setup work and delay." },
+        potential: { score: 4, note: "The connector based architecture is close to its ceiling. Further investment improves reliability, not the underlying speed or depth of integration." }
+      },
+      mcn: {
+        current: { score: 3, note: "The native connection to Data 360 is a strong advantage, but the platform is newer, so fewer teams have tested it against complex real world integrations at scale." },
+        potential: { score: 5, note: "There is no architectural ceiling here. As the platform matures and more teams adopt it, this native foundation should close the gap with proven setups." }
+      }
+    },
+    {
+      id: "orchestration",
+      title: "2. Orchestration layer",
+      rows: [
+        ["Journey and campaign building tool",
+          "Uses Journey Builder and Automation Studio, mature tools purpose built for marketing journeys.",
+          "Uses Salesforce Flow Builder, the same automation tool used across the Salesforce platform, so marketing journeys share building blocks with sales and service processes."],
+        ["B2B and B2C orchestration",
+          "Treats B2B and B2C marketing separately, since MCE covers B2C and a related product, Marketing Cloud Account Engagement, covers B2B.",
+          "Combines B2B and B2C marketing in a single application, so teams no longer need to manage two separate platforms."],
+        ["Multi-channel sequencing and triggers",
+          "Sequences email, SMS, push, and WhatsApp (via native or connector-based setup depending on edition), triggered mostly by scheduled batches or automation rules rather than live events.",
+          "Supports native SMS and WhatsApp messaging in the Growth and Advanced editions, with journeys that can trigger in real time off live events such as SMS or WhatsApp replies and commerce interactions. Newer capabilities like RCS messaging, WhatsApp payment templates, and interactive elements are rolling out, but coverage still varies by hosting region and country, and continues to expand release by release."],
+        ["Campaign process complexity (end-to-end management)",
+          "Running a campaign end to end means coordinating across several specialized tools (Journey Builder, Automation Studio, Content Builder, Mobile Studio), which gives deep control but adds handoffs between modules.",
+          "The process is more consolidated within a single app on the Salesforce platform, using Flow Builder and one shared content workspace, which reduces handoffs, though marketing teams also need to get comfortable with Salesforce Flow concepts that were not previously part of their day-to-day work."]
+      ],
+      mce: {
+        current: { score: 4, note: "Journey Builder and Automation Studio are proven, feature rich tools trusted by large B2C programs, though they were not designed for real time triggers." },
+        potential: { score: 4, note: "Feature depth can still grow, but the batch and single channel foundation caps how far orchestration can evolve without a rebuild." }
+      },
+      mcn: {
+        current: { score: 3, note: "Native SMS and WhatsApp messaging is a genuine strength, and Flow based orchestration is more flexible and modern, but regional rollout gaps and unified B2B and B2C journey depth are still catching up to MCE's toolset." },
+        potential: { score: 5, note: "Unified B2B and B2C orchestration on a real time, event driven foundation, with native SMS and WhatsApp already in place, gives this a clear path to outgrow MCE's toolset once regional coverage and journey depth catch up." }
+      }
+    },
+    {
+      id: "intelligence",
+      title: "3. Intelligence layer",
+      rows: [
+        ["AI and agentic capabilities",
+          "Uses Einstein AI as an add-on layered on top of the existing platform.",
+          "Uses Agentforce agents built natively into the platform, able to draft campaign briefs, generate audience segments, and optimize send times on their own."],
+        ["Predictive scoring and propensity models",
+          "Offers predictive scoring through Einstein, based on historical MCE data.",
+          "Offers predictive scoring natively through Data 360 and Agentforce, drawing on unified data from sales, service, and commerce as well as marketing."],
+        ["Send time optimization and next best action",
+          "Provides send time optimization as an Einstein feature within MCE.",
+          "Provides send time optimization and next best action recommendations as native, always-on capabilities tied to the shared customer profile."],
+        ["Path and journey experimentation",
+          "Supports A/B testing within Journey Builder.",
+          "The Advanced edition supports path experimentation and predictive AI scoring built directly into the platform."]
+      ],
+      mce: {
+        current: { score: 3, note: "Einstein AI works well, but it is an added layer, so results depend on how MCE data is set up, and it does not draw on sales or service data as easily." },
+        potential: { score: 3, note: "Without native access to unified customer data, AI quality here is structurally capped, regardless of future feature additions." }
+      },
+      mcn: {
+        current: { score: 4, note: "Native Agentforce agents and shared data give MCN a real advantage for AI use cases, though some features are new and still maturing." },
+        potential: { score: 5, note: "Shared data across sales, service, and marketing means AI quality compounds as adoption grows, giving this the highest long term ceiling." }
+      }
+    },
+    {
+      id: "data",
+      title: "4. Data layer",
+      rows: [
+        ["Underlying data foundation",
+          "Connected via sync and connectors; Data 360 sits alongside MCE, not built in.",
+          "Built natively on Data 360, so there is no separate data layer to maintain."],
+        ["Segmentation engine",
+          "Batch based segmentation, refreshed on sync intervals.",
+          "Real time segmentation, run directly on Data 360."],
+        ["Consent and preference management",
+          "Managed in MCE and mapped to Data 360 through integration.",
+          "Native consent data in Data 360, shared across Sales, Service, and Marketing."],
+        ["Data governance and harmonization",
+          "Governed within MCE, with harmonization logic kept separate from Data 360.",
+          "Harmonization and identity resolution run natively in Data 360 and are shared across the org."],
+        ["Data quality and profile unification accuracy",
+          "Unification quality depends on how well the sync and field mapping between MCE and Data 360 is maintained, since matching happens in a separate system.",
+          "Identity resolution runs natively inside Data 360, giving marketers more direct control over match rules and reconciliation logic without waiting on a separate sync process."],
+        ["Scalability at high data volumes",
+          "MCE has processed large scale sends reliably for years, but scaling further generally means scaling two connected systems, MCE and Data 360, together.",
+          "Scales through the same Data 360 pipeline used by the rest of the business, though large identity resolution jobs need careful design, since processing time and credit consumption increase directly with data volume."]
+      ],
+      mce: {
+        current: { score: 4, note: "This is a proven and stable setup for segmentation and governance, but sync delays limit real time use cases and add integration overhead." },
+        potential: { score: 4, note: "Governance can keep improving, but the fundamental separation from Data 360 keeps this from becoming a true single source of truth." }
+      },
+      mcn: {
+        current: { score: 4, note: "The native, single data foundation is already delivering real results for segmentation, consent, and identity resolution, even though the platform is newer and some workflows still need careful design at scale." },
+        potential: { score: 5, note: "A single, native data foundation shared across the business is the strongest possible position once usage patterns and credit management practices are fully proven at scale." }
+      }
+    },
+    {
+      id: "activation",
+      title: "5. Activation layer",
+      rows: [
+        ["Audience activation speed",
+          "Activating an audience usually requires a sync from Data 360 into MCE first, which takes time.",
+          "Activates audiences directly from Data 360 in real time, with no separate activation step."],
+        ["Channel activation breadth",
+          "Activates audiences across email, SMS, and other established MCE channels.",
+          "Activates audiences across email, SMS, WhatsApp, and other channels, using the same unified profile used by sales and service."],
+        ["Personalization at activation",
+          "Uses Marketing Cloud Personalization, built on its own separate, graph based data structure.",
+          "Uses Salesforce Personalization, built natively on Data 360 using a simpler, table based structure."],
+        ["Advertising activation",
+          "Historically activates ad audiences through Advertising Studio, a standalone point solution that Salesforce is now sunsetting in favor of Data 360 Ad Audiences, so the future path runs through the same add-on MCN already uses natively.",
+          "Activates consented audiences directly to Google, Meta, Amazon Ads, LinkedIn, The Trade Desk, and CTV partners through native, zero-copy connectors built into Data 360, without a separate point solution to maintain."]
+      ],
+      mce: {
+        current: { score: 3, note: "Activation works well but depends on syncing data first, which slows down time sensitive campaigns." },
+        potential: { score: 3, note: "Activation speed is bound by the sync architecture, so this stays a structural limitation even with future feature updates." }
+      },
+      mcn: {
+        current: { score: 4, note: "Real time activation directly from Data 360 is a clear improvement, though it requires migrating data models such as personalization catalogs." },
+        potential: { score: 5, note: "Once personalization and catalog migration are complete, real time activation across every channel becomes the standing advantage." }
+      }
+    },
+    {
+      id: "content",
+      title: "6. Content layer",
+      rows: [
+        ["Email creation and design",
+          "Emails are built in Content Builder using a mature drag-and-drop and HTML editor, with a wide library of reusable content blocks refined over many years.",
+          "Emails are built in a newer Content Workspace that plays the same role as Content Builder, but with a narrower set of content blocks and editing tools so far."],
+        ["AMPscript and personalization scripting",
+          "Supports the full AMPscript function library for personalizing emails, SMS, landing pages, and push notifications, refined over more than a decade.",
+          "AMPscript support launched in mid-2026 and currently covers roughly 30 percent of the functions available in MCE, and legacy Content Builder AMPscript functions are not available, so complex personalization logic often cannot be replicated yet."],
+        ["Creation of other channel messages (SMS, WhatsApp, push)",
+          "SMS and push messages are created through Mobile Studio, a mature, purpose-built tool with templates refined over many years.",
+          "SMS and WhatsApp messages are created directly in the Content Workspace, with newer interactive elements such as WhatsApp stickers and payment templates, though feature and country coverage still varies and is expanding release by release."],
+        ["Template and multi-language management",
+          "Content Builder offers a mature folder structure and template library for reusing content across campaigns and channels. Multi-language content relies on dynamic content blocks, separate language-specific templates, or third-party translation plugins, since there is no native content-variation-by-language feature.",
+          "Template tooling in the newer Content Workspace is still narrower than Content Builder's, but the Summer 2026 release introduced native Content Variations, letting a single email carry multiple language versions tied to a contact's language field, a capability MCE does not have natively."],
+        ["AI-assisted content creation",
+          "Limited native support, mostly through added Einstein content tools layered on top of Content Builder.",
+          "Agentforce agents can draft and refine email and message content directly within the Content Workspace."]
+      ],
+      mce: {
+        current: { score: 4, note: "Content Builder, AMPscript, and Mobile Studio are mature, deeply featured tools used by large teams for years." },
+        potential: { score: 4, note: "This toolset is already close to feature complete for its use case, leaving limited room for further gains." }
+      },
+      mcn: {
+        current: { score: 3, note: "Content creation is behind MCE overall, since AMPscript covers only a fraction of MCE's functions and the content workspace is still narrower, but native language variations and AI drafting are genuine, real capabilities already in production." },
+        potential: { score: 4, note: "Coverage is expanding release by release, and native AI drafting plus language variations are real advantages, but fully matching Content Builder and AMPscript's depth will take sustained investment." }
+      }
+    },
+    {
+      id: "reporting",
+      title: "7. Reporting and insights layer",
+      rows: [
+        ["Analytics and reporting engine",
+          "Uses Datorama or MCE's built-in reporting, which lives outside of Data 360.",
+          "Uses native reporting connected directly to Data 360, so marketing data is easier to view alongside sales and service data."],
+        ["Cross-channel attribution and campaign ROI reporting",
+          "Attribution requires connecting data from multiple tools, since MCE and CRM data are not always unified.",
+          "Attribution is simpler because campaign, sales, and service data already live in the same place."],
+        ["Real time versus batch reporting refresh",
+          "Reports usually refresh on a schedule, matching the batch sync model.",
+          "Reports can reflect near real time data, matching the real time nature of Data 360."],
+        ["Custom and self-service reporting for marketers",
+          "Marketers can build reports within MCE tools, with some reliance on technical teams for complex needs.",
+          "Marketers can use Salesforce reporting tools already familiar to sales and service teams, which lowers the learning curve."]
+      ],
+      mce: {
+        current: { score: 3, note: "Reporting works but often needs extra tools or manual effort to connect marketing results with CRM data." },
+        potential: { score: 3, note: "Attribution accuracy is capped by the disconnect from CRM data at the source, regardless of reporting tool improvements." }
+      },
+      mcn: {
+        current: { score: 3, note: "Native reporting is promising, but the dashboards and tools built specifically for marketing needs are still being developed." },
+        potential: { score: 5, note: "Reporting directly on unified data gives this the clearest long term path to accurate, real time, cross-cloud attribution." }
+      }
+    },
+    {
+      id: "general",
+      title: "8. General",
+      rows: [
+        ["Release cadence and roadmap momentum",
+          "Salesforce has not announced an end date for MCE and continues to support it, but new feature investment is increasingly focused on MCN.",
+          "Announced in 2024 and made generally available in June 2025, MCN is where Salesforce is putting most of its new investment, with frequent updates expected as the platform matures."],
+        ["Platform governance (admin duties)",
+          "Administered through MCE's own Setup and Business Unit model, a mature, marketing-specific admin experience that is separate from core Salesforce administration.",
+          "Administered through standard Salesforce Setup, profiles, and permission sets, unifying marketing admin with the rest of the org. MCN has its own Business Unit model for assigning channels and subscriptions, but marketing admins used to MCE's standalone setup will need to learn core Salesforce admin concepts."],
+        ["Consumption model management",
+          "Uses a subscriber and seat based licensing model, which is predictable and easy to forecast year to year.",
+          "Uses a consumption based credit model shared with Data 360, billed per operation (ingestion, unification, segmentation, activation, and messaging). Native ingestion from Salesforce apps is free, but external data, high-volume identity resolution, and messaging all draw down credits, so usage needs active monitoring through the Digital Wallet to avoid unexpected cost spikes."]
+      ],
+      mce: {
+        current: { score: 4, note: "Licensing and admin are mature and predictable, well documented, and familiar to teams that have run MCE for years." },
+        potential: { score: 4, note: "This is a stable, well understood setup with limited additional upside left to unlock." }
+      },
+      mcn: {
+        current: { score: 3, note: "Unified Salesforce admin and a flexible credit model are real strengths, but both require new habits and careful monitoring compared to MCE's simpler, standalone setup." },
+        potential: { score: 5, note: "As best practices mature, unified governance and flexible consumption should outgrow MCE's simpler but more rigid model, especially at enterprise scale." }
+      }
+    }
+  ]
+};
+
+// ─────────────────────────────────────────────────────────
+// SUPABASE PERSISTENCE
+// Reuses the same project/table set up for the base template.
+// Each client link gets its own saved filter state via DEMO_ID,
+// e.g. yoursite.vercel.app?client=acme
+// ─────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://xoqrmymvhtomsgbcyliu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvcXJteW12aHRvbXNnYmN5bGl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwMzAxNzUsImV4cCI6MjEwNDYwNjE3NX0._kZLYLl9ojnZ9WblOg0ip3BBvikTBi-bZG6KmmcxRm0';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const DEMO_ID = 'mce-mcn-' + (new URLSearchParams(location.search).get('client') || 'default');
+
+function setSyncStatus(msg){
+  const el = document.getElementById('syncStatus');
+  if(!el) return;
+  el.textContent = msg;
+  if(msg){ setTimeout(()=>{ if(el.textContent === msg) el.textContent = ''; }, 2000); }
+}
+
+async function loadFilterState(){
+  try{
+    const { data, error } = await supabaseClient
+      .from('prototype_state')
+      .select('data')
+      .eq('demo_id', DEMO_ID)
+      .maybeSingle();
+    if(error){ console.error(error); return; }
+    if(data && data.data){
+      if(data.data.layerState) Object.assign(layerState, data.data.layerState);
+      if(data.data.currentView) currentView = data.data.currentView;
+    }
+  }catch(e){ console.error(e); }
+}
+
+async function saveFilterState(){
+  setSyncStatus('· saving…');
+  try{
+    const { error } = await supabaseClient
+      .from('prototype_state')
+      .upsert({ demo_id: DEMO_ID, data: { layerState, currentView } }, { onConflict: 'demo_id' });
+    if(error){ console.error(error); setSyncStatus('· save failed'); }
+    else{ setSyncStatus('· saved'); }
+  }catch(e){ console.error(e); setSyncStatus('· save failed'); }
+}
+
+function round1(n){ return Math.round(n * 10) / 10; }
+
+const LAYER_COLORS = ["#CC2229","#161615","#B08D2E","#7C7C76","#A70009","#4A4A48","#E8848A","#9C9C94"];
+
+const layerState = {};
+DATA.layers.forEach(l => layerState[l.id] = true);
+
+let currentView = "maturity"; // maturity | potential
+let scoreChart = null;
+
+function shortName(layer){
+  return layer.title.replace(/^\d+\.\s*/, "").replace(" layer","").replace(" and insights","");
+}
+
+function selectedLayers(){
+  return DATA.layers.filter(l => layerState[l.id]);
+}
+
+function computeAvg(platform, mode, layers){
+  if(layers.length === 0) return 0;
+  const key = mode === "potential" ? "potential" : "current";
+  return round1(layers.reduce((s,l)=>s+l[platform][key].score,0) / layers.length);
+}
+
+function buildMenu(){
+  const wrap = document.getElementById("menuInner");
+  const allBtn = document.createElement("button");
+  allBtn.className = "menu-btn active";
+  allBtn.textContent = "Show all";
+  allBtn.dataset.target = "all";
+  wrap.appendChild(allBtn);
+
+  DATA.layers.forEach(layer=>{
+    const b = document.createElement("button");
+    b.className = "menu-btn";
+    b.textContent = shortName(layer);
+    b.dataset.target = layer.id;
+    wrap.appendChild(b);
+  });
+
+  wrap.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".menu-btn");
+    if(!btn) return;
+    wrap.querySelectorAll(".menu-btn").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    filterLayers(btn.dataset.target);
+  });
+}
+
+function filterLayers(target){
+  document.querySelectorAll("section.layer-block").forEach(sec=>{
+    sec.style.display = (target === "all" || sec.dataset.id === target) ? "" : "none";
+  });
+}
+
+function tableRowsHtml(rows){
+  return rows.map(r => `
+    <tr>
+      <td class="cap">${r[0]}</td>
+      <td>${r[1]}</td>
+      <td>${r[2]}</td>
+    </tr>`).join("");
+}
+
+function layerSectionHtml(layer){
+  const rows = tableRowsHtml(layer.rows);
+  const maturityRow = `
+    <tr class="score-row maturity">
+      <td class="cap">Maturity score</td>
+      <td><span class="score-badge">${layer.mce.current.score}/5</span>${layer.mce.current.note}</td>
+      <td><span class="score-badge">${layer.mcn.current.score}/5</span>${layer.mcn.current.note}</td>
+    </tr>`;
+  const potentialRow = `
+    <tr class="score-row potential">
+      <td class="cap">Potential score</td>
+      <td><span class="score-badge">${layer.mce.potential.score}/5</span>${layer.mce.potential.note}</td>
+      <td><span class="score-badge">${layer.mcn.potential.score}/5</span>${layer.mcn.potential.note}</td>
+    </tr>`;
+  return `
+  <section class="layer-block" data-id="${layer.id}">
+    <div class="layer-head">
+      <h2>${layer.title}</h2>
+    </div>
+    <table class="compare">
+      <thead>
+        <tr><th>Capability</th><th>MCE + Data 360</th><th>MCN + Data 360</th></tr>
+      </thead>
+      <tbody>
+        ${rows}
+        ${maturityRow}
+        ${potentialRow}
+      </tbody>
+    </table>
+  </section>`;
+}
+
+function renderContent(){
+  const main = document.getElementById("mainContent");
+  let html = "";
+  DATA.layers.forEach(l => html += layerSectionHtml(l));
+
+  html += `
+  <section class="summary" id="summarySection">
+    <h2>Overall maturity: maturity score vs. potential score</h2>
+    <p class="summary-sub">Select which layers to include — averages and chart recalculate live</p>
+
+    <div class="chart-filter">
+      <div class="filter-label">
+        <span>Layers included</span>
+        <span class="filter-actions">
+          <button id="selectAllBtn" type="button">Select all</button>
+          <button id="clearAllBtn" type="button">Clear</button>
+        </span>
+      </div>
+      <div class="filter-pills" id="filterPills"></div>
+    </div>
+
+    <div class="avg-cards">
+      <div class="avg-card mce">
+        <div class="label">MCE + Data 360</div>
+        <div class="rows">
+          <div><span class="metric-label">Maturity score</span><span class="value maturity" id="mceMaturityValue"></span></div>
+          <div><span class="metric-label">Potential score</span><span class="value potential" id="mcePotentialValue"></span></div>
+        </div>
+      </div>
+      <div class="avg-card mcn">
+        <div class="label">MCN + Data 360</div>
+        <div class="rows">
+          <div><span class="metric-label">Maturity score</span><span class="value maturity" id="mcnMaturityValue"></span></div>
+          <div><span class="metric-label">Potential score</span><span class="value potential" id="mcnPotentialValue"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-switch" id="viewSwitch">
+      <button data-view="maturity" class="active">Maturity score</button>
+      <button data-view="potential">Potential score</button>
+    </div>
+
+    <div class="chart-wrap">
+      <canvas id="scoreChart" role="img" aria-label="Horizontal stacked bar chart comparing maturity and potential scores by layer for MCE plus Data 360 and MCN plus Data 360.">
+      </canvas>
+    </div>
+    <p class="chart-note" id="chartNote"></p>
+  </section>`;
+
+  main.innerHTML = html;
+}
+
+function buildFilterPills(){
+  const wrap = document.getElementById("filterPills");
+  wrap.innerHTML = DATA.layers.map((l,i) => `
+    <div class="pill" data-id="${l.id}">
+      <span class="dot" style="background:${LAYER_COLORS[i % LAYER_COLORS.length]};"></span>
+      ${shortName(l)}
+    </div>`).join("");
+
+  wrap.addEventListener("click", (e)=>{
+    const pill = e.target.closest(".pill");
+    if(!pill) return;
+    layerState[pill.dataset.id] = !layerState[pill.dataset.id];
+    refreshAll();
+    saveFilterState();
+  });
+
+  document.getElementById("selectAllBtn").addEventListener("click", ()=>{
+    DATA.layers.forEach(l => layerState[l.id] = true);
+    refreshAll();
+    saveFilterState();
+  });
+  document.getElementById("clearAllBtn").addEventListener("click", ()=>{
+    DATA.layers.forEach(l => layerState[l.id] = false);
+    refreshAll();
+    saveFilterState();
+  });
+}
+
+function buildViewSwitch(){
+  const wrap = document.getElementById("viewSwitch");
+  wrap.addEventListener("click", (e)=>{
+    const btn = e.target.closest("button");
+    if(!btn) return;
+    currentView = btn.dataset.view;
+    wrap.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    buildChart();
+    saveFilterState();
+  });
+}
+
+function refreshAll(){
+  document.querySelectorAll("#filterPills .pill").forEach(p=>{
+    p.classList.toggle("off", !layerState[p.dataset.id]);
+  });
+  updateAverages();
+  buildChart();
+}
+
+function updateAverages(){
+  const layers = selectedLayers();
+  const has = layers.length > 0;
+  const mceMaturity = computeAvg("mce","maturity",layers);
+  const mcePotential = computeAvg("mce","potential",layers);
+  const mcnMaturity = computeAvg("mcn","maturity",layers);
+  const mcnPotential = computeAvg("mcn","potential",layers);
+
+  document.getElementById("mceMaturityValue").innerHTML = has ? `${mceMaturity}<span> /5</span>` : "—";
+  document.getElementById("mcePotentialValue").innerHTML = has ? `${mcePotential}<span> /5</span>` : "—";
+  document.getElementById("mcnMaturityValue").innerHTML = has ? `${mcnMaturity}<span> /5</span>` : "—";
+  document.getElementById("mcnPotentialValue").innerHTML = has ? `${mcnPotential}<span> /5</span>` : "—";
+}
+
+function buildChart(){
+  const layers = selectedLayers();
+  const canvas = document.getElementById("scoreChart");
+  const noteEl = document.getElementById("chartNote");
+
+  if(scoreChart){ scoreChart.destroy(); scoreChart = null; }
+
+  if(layers.length === 0){
+    canvas.setAttribute("aria-label", "No layers selected, chart is empty.");
+    noteEl.textContent = "Select at least one layer to see the average.";
+    return;
+  }
+
+  const mceAvg = computeAvg("mce", currentView, layers);
+  const mcnAvg = computeAvg("mcn", currentView, layers);
+  const viewLabel = currentView === "potential" ? "potential score" : "maturity score";
+
+  canvas.setAttribute("aria-label",
+    `Horizontal bar chart showing the average ${viewLabel}, out of 5, for MCE plus Data 360 and MCN plus Data 360, based on ${layers.length} selected layers.`);
+
+  const notes = {
+    maturity: "Average maturity score across the layers you've selected.",
+    potential: "Average potential score across the layers you've selected."
+  };
+  noteEl.textContent = notes[currentView];
+
+  scoreChart = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: ["MCE + Data 360", "MCN + Data 360"],
+      datasets: [{
+        data: [mceAvg, mcnAvg],
+        backgroundColor: ["#CC2229", "#161615"],
+        borderRadius: 2,
+        maxBarThickness: 60
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { min: 0, max: 5, grid: { color: "#E5E3DC" } },
+        y: { grid: { display: false }, ticks: { font: { size: 14, weight: "600" } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.parsed.x} / 5`
+          }
+        }
+      }
+    }
+  });
+}
+
+function exportToExcel(){
+  const wb = XLSX.utils.book_new();
+
+  DATA.layers.forEach(layer=>{
+    const name = shortName(layer);
+    const sheetData = [["Capability", "MCE + Data 360", "MCN + Data 360"]];
+    layer.rows.forEach(r => sheetData.push(r));
+    sheetData.push(["Maturity score",
+      `${layer.mce.current.score}/5 — ${layer.mce.current.note}`,
+      `${layer.mcn.current.score}/5 — ${layer.mcn.current.note}`]);
+    sheetData.push(["Potential score",
+      `${layer.mce.potential.score}/5 — ${layer.mce.potential.note}`,
+      `${layer.mcn.potential.score}/5 — ${layer.mcn.potential.note}`]);
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+    ws["!cols"] = [{wch: 32},{wch: 60},{wch: 60}];
+    XLSX.utils.book_append_sheet(wb, ws, name.substring(0,31));
+  });
+
+  const allLayers = DATA.layers;
+
+  const summaryData = [["Layer", "MCE maturity", "MCE potential", "MCN maturity", "MCN potential"]];
+  DATA.layers.forEach(l => summaryData.push([
+    shortName(l),
+    l.mce.current.score, l.mce.potential.score,
+    l.mcn.current.score, l.mcn.potential.score
+  ]));
+  summaryData.push([
+    `Overall average (${allLayers.length} layers)`,
+    computeAvg("mce","maturity",allLayers), computeAvg("mce","potential",allLayers),
+    computeAvg("mcn","maturity",allLayers), computeAvg("mcn","potential",allLayers)
+  ]);
+  const wsSum = XLSX.utils.aoa_to_sheet(summaryData);
+  wsSum["!cols"] = [{wch: 24},{wch: 14},{wch: 14},{wch: 14},{wch: 14}];
+  XLSX.utils.book_append_sheet(wb, wsSum, "Score summary");
+
+  XLSX.writeFile(wb, "MCE_vs_MCN_Comparison.xlsx");
+}
+
+async function init(){
+  await loadFilterState();
+  buildMenu();
+  renderContent();
+  buildFilterPills();
+  buildViewSwitch();
+  // Reflect restored view in the toggle buttons and filter pills
+  document.querySelectorAll("#viewSwitch button").forEach(b=>{
+    b.classList.toggle("active", b.dataset.view === currentView);
+  });
+  document.querySelectorAll("#filterPills .pill").forEach(p=>{
+    p.classList.toggle("off", !layerState[p.dataset.id]);
+  });
+  updateAverages();
+  buildChart();
+  document.getElementById("exportBtn").addEventListener("click", exportToExcel);
+}
+init();
+
+</script>
+</body>
+</html>
