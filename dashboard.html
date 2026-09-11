@@ -261,9 +261,21 @@
       const { supabaseUrl, supabaseKey } = await res.json();
       dashboardClient = window.supabase.createClient(supabaseUrl, supabaseKey);
       
-      // Give session time to restore from localStorage
-      await new Promise(r => setTimeout(r, 500));
+      // Check if session exists in localStorage
+      const session = localStorage.getItem('supabaseSession');
       
+      if (!session) {
+        console.log('No session found');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      const sessionData = JSON.parse(session);
+      
+      // Set the session in Supabase
+      await dashboardClient.auth.setSession(sessionData);
+      
+      // Now check if user exists
       const { data: { user }, error } = await dashboardClient.auth.getUser();
       
       if (error || !user) {
