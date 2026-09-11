@@ -100,46 +100,58 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    let client;
+<script>
+  let client;
+  let isReady = false;
 
-async function initSupabase() {
-  const res = await fetch('/api/config');
-  const { supabaseUrl, supabaseKey } = await res.json();
-  client = window.supabase.createClient(supabaseUrl, supabaseKey);
-}
+  async function initSupabase() {
+    try {
+      const res = await fetch('/api/config');
+      const { supabaseUrl, supabaseKey } = await res.json();
+      client = window.supabase.createClient(supabaseUrl, supabaseKey);
+      isReady = true;
+    } catch (err) {
+      console.error('Failed to init Supabase:', err);
+    }
+  }
 
-initSupabase();
+  initSupabase();
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+  async function handleLogin(event) {
+    event.preventDefault();
+    
+    if (!isReady) {
+      document.getElementById('error').textContent = 'Loading... please wait';
+      return;
+    }
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('error');
+    const btn = document.getElementById('loginBtn');
+    
+    errorDiv.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+
+    try {
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
       
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const errorDiv = document.getElementById('error');
-      const btn = document.getElementById('loginBtn');
-      
-      errorDiv.textContent = '';
-      btn.disabled = true;
-      btn.textContent = 'Logging in...';
-
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        
-        if (error) {
-          errorDiv.textContent = error.message;
-          btn.disabled = false;
-          btn.textContent = 'Login';
-        } else {
-          // Store session and redirect
-          window.location.href = 'dashboard.html';
-        }
-      } catch (err) {
-        errorDiv.textContent = 'An error occurred. Please try again.';
+      if (error) {
+        console.error('Login error:', error);
+        errorDiv.textContent = error.message;
         btn.disabled = false;
         btn.textContent = 'Login';
+      } else {
+        window.location.href = 'dashboard.html';
       }
-    });
-  </script>
+    } catch (err) {
+      console.error('Exception:', err);
+      errorDiv.textContent = 'An error occurred: ' + err.message;
+      btn.disabled = false;
+      btn.textContent = 'Login';
+    }
+  }
+</script>
 </body>
 </html>
