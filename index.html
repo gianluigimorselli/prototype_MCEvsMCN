@@ -101,10 +101,15 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || localStorage.getItem('supabaseUrl');
-    const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || localStorage.getItem('supabaseKey');
+    let client;
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+async function initSupabase() {
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseKey } = await res.json();
+  client = window.supabase.createClient(supabaseUrl, supabaseKey);
+}
+
+initSupabase();
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
