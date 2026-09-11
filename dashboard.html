@@ -255,25 +255,28 @@
 <script>
   let dashboardClient;
 
-async function initSupabase() {
-  const res = await fetch('/api/config');
-  const { supabaseUrl, supabaseKey } = await res.json();
-  dashboardClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-  
-  dashboardClient.auth.getUser().then(({ data, error }) => {
-    if (error || !data.user) {
+  async function initSupabaseAndCheckAuth() {
+    try {
+      const res = await fetch('/api/config');
+      const { supabaseUrl, supabaseKey } = await res.json();
+      dashboardClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+      
+      // Give session time to restore from localStorage
+      await new Promise(r => setTimeout(r, 500));
+      
+      const { data: { user }, error } = await dashboardClient.auth.getUser();
+      
+      if (error || !user) {
+        console.log('No user found, redirecting to login');
+        window.location.href = 'index.html';
+      }
+    } catch (err) {
+      console.error('Auth check error:', err);
       window.location.href = 'index.html';
     }
-  });
-}
+  }
 
-initSupabase();
-
-  supabase.auth.getUser().then(({ data, error }) => {
-    if (error || !data.user) {
-      window.location.href = 'index.html';
-    }
-  });
+  initSupabaseAndCheckAuth();
 </script>
 <body>
 
