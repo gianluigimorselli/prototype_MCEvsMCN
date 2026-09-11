@@ -253,14 +253,21 @@
 </head>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = localStorage.getItem('supabaseUrl');
-  const SUPABASE_KEY = localStorage.getItem('supabaseKey');
-  
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    window.location.href = 'index.html';
-  }
+  let dashboardClient;
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+async function initSupabase() {
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseKey } = await res.json();
+  dashboardClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  dashboardClient.auth.getUser().then(({ data, error }) => {
+    if (error || !data.user) {
+      window.location.href = 'index.html';
+    }
+  });
+}
+
+initSupabase();
 
   supabase.auth.getUser().then(({ data, error }) => {
     if (error || !data.user) {
@@ -892,13 +899,13 @@ init();
 
 <script>
   async function logout() {
-    const SUPABASE_URL = localStorage.getItem('supabaseUrl');
-    const SUPABASE_KEY = localStorage.getItem('supabaseKey');
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    await supabase.auth.signOut();
-    window.location.href = 'index.html';
-  }
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseKey } = await res.json();
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  await client.auth.signOut();
+  window.location.href = 'index.html';
+}
 </script>
 </body>
 </html>
