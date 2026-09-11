@@ -48,7 +48,7 @@
   .brand .logo{ height:34px; width:auto; display:block; }
   .brand .divider{ width:1px; height:22px; background:rgba(255,255,255,0.5); }
   .brand .subtitle{ font-size:14px; color:rgba(255,255,255,0.92); font-weight:500; }
-  #exportBtn{
+  #exportBtn, #logoutBtn{
     background:#fff;
     color:var(--hilti-red);
     border:none;
@@ -63,7 +63,12 @@
     gap:8px;
     transition:background 0.15s ease;
   }
-  #exportBtn:hover{ background:#f0f0f0; }
+  #exportBtn:hover, #logoutBtn:hover{ background:#f0f0f0; }
+  .header-actions{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
   .hero{ padding:40px 32px 24px; max-width:1180px; margin:0 auto; }
   .hero h1{ font-size:38px; line-height:1.05; color:var(--ink); }
   .hero p{ max-width:680px; font-size:15px; color:var(--ink-soft); line-height:1.6; margin-top:12px; }
@@ -298,7 +303,10 @@
     <span class="divider"></span>
     <span class="subtitle">Martech platform review</span>
   </div>
-  <button id="exportBtn">Export to Excel</button>
+  <div class="header-actions">
+    <button id="exportBtn">Export to Excel</button>
+    <button id="logoutBtn">Logout</button>
+  </div>
 </header>
 
 <div class="hero">
@@ -909,18 +917,16 @@ async function init(){
 }
 init();
 
-</script>
-  <button onclick="logout()" style="position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #CC2229; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Logout</button>
-<script>
-  async function logout() {
-    const res = await fetch('/api/config');
-    const { supabaseUrl, supabaseKey } = await res.json();
-    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
-    
-    localStorage.removeItem('supabaseSession');
-    await client.auth.signOut();
-    window.location.href = 'index.html';
-  }
+document.getElementById('logoutBtn').addEventListener('click', async function() {
+  const res = await fetch('/api/config');
+  const { supabaseUrl, supabaseKey } = await res.json();
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  localStorage.removeItem('supabaseSession');
+  await client.auth.signOut();
+  window.location.href = 'index.html';
+});
+
 </script>
 
 </body>
