@@ -117,7 +117,7 @@
 
   initSupabase();
 
-  async function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
   
   if (!isReady) {
@@ -135,20 +135,29 @@
   btn.textContent = 'Logging in...';
 
   try {
+    console.log('Starting login with:', email);
     const { data, error } = await client.auth.signInWithPassword({ email, password });
+    
+    console.log('Login response - error:', error);
+    console.log('Login response - data:', data);
     
     if (error) {
       console.error('Login error:', error);
       errorDiv.textContent = error.message;
       btn.disabled = false;
       btn.textContent = 'Login';
-    } else {
-      // Manually save session
+    } else if (data.session) {
+      console.log('Session found, saving...');
       localStorage.setItem('supabaseSession', JSON.stringify(data.session));
-      // Redirect after short delay
+      console.log('Session saved, redirecting...');
       setTimeout(() => {
         window.location.href = 'dashboard.html';
       }, 100);
+    } else {
+      console.log('No session in response');
+      errorDiv.textContent = 'Login failed - no session returned';
+      btn.disabled = false;
+      btn.textContent = 'Login';
     }
   } catch (err) {
     console.error('Exception:', err);
@@ -157,6 +166,7 @@
     btn.textContent = 'Login';
   }
 }
+  
 </script>
 </body>
 </html>
