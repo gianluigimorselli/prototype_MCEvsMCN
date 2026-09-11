@@ -118,40 +118,45 @@
   initSupabase();
 
   async function handleLogin(event) {
-    event.preventDefault();
-    
-    if (!isReady) {
-      document.getElementById('error').textContent = 'Loading... please wait';
-      return;
-    }
-    
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorDiv = document.getElementById('error');
-    const btn = document.getElementById('loginBtn');
-    
-    errorDiv.textContent = '';
-    btn.disabled = true;
-    btn.textContent = 'Logging in...';
+  event.preventDefault();
+  
+  if (!isReady) {
+    document.getElementById('error').textContent = 'Loading... please wait';
+    return;
+  }
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorDiv = document.getElementById('error');
+  const btn = document.getElementById('loginBtn');
+  
+  errorDiv.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
 
-    try {
-      const { data, error } = await client.auth.signInWithPassword({ email, password });
-      
-      if (error) {
-        console.error('Login error:', error);
-        errorDiv.textContent = error.message;
-        btn.disabled = false;
-        btn.textContent = 'Login';
-      } else {
-        window.location.href = 'dashboard.html';
-      }
-    } catch (err) {
-      console.error('Exception:', err);
-      errorDiv.textContent = 'An error occurred: ' + err.message;
+  try {
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      console.error('Login error:', error);
+      errorDiv.textContent = error.message;
       btn.disabled = false;
       btn.textContent = 'Login';
+    } else {
+      // Manually save session
+      localStorage.setItem('supabaseSession', JSON.stringify(data.session));
+      // Redirect after short delay
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 100);
     }
+  } catch (err) {
+    console.error('Exception:', err);
+    errorDiv.textContent = 'An error occurred: ' + err.message;
+    btn.disabled = false;
+    btn.textContent = 'Login';
   }
+}
 </script>
 </body>
 </html>
