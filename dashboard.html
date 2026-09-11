@@ -911,16 +911,17 @@ init();
 
 </script>
   <button onclick="logout()" style="position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #CC2229; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Logout</button>
-
 <script>
   async function logout() {
-  const res = await fetch('/api/config');
-  const { supabaseUrl, supabaseKey } = await res.json();
-  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
-  
-  await client.auth.signOut();
-  window.location.href = 'index.html';
-}
+    const res = await fetch('/api/config');
+    const { supabaseUrl, supabaseKey } = await res.json();
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+    
+    localStorage.removeItem('supabaseSession');
+    await client.auth.signOut();
+    window.location.href = 'index.html';
+  }
 </script>
+
 </body>
 </html>
